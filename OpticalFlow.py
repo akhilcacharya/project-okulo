@@ -6,6 +6,14 @@ import numpy as np
 import math
 from sklearn import datasets, svm, metrics, tree, ensemble, linear_model
 import glob
+import HoG
+
+
+CELL_WIDTH = 8
+CELL_HEIGHT = 8
+
+rootdir_training = '/media/sf_Video_Dataset'
+rootdir_testing = 'media/sf_Video_Dataset'
 
 original_frame1 = cv2.imread("tennis492.jpg")
 original_frame2 = cv2.imread("tennis493.jpg")
@@ -64,11 +72,7 @@ def calcMatrixValues(curr_row, curr_col, prev_frame, curr_frame):
             lucas_kanade_matrix[0][1] = -1 * b / det
             lucas_kanade_matrix[1][0] = -1 * c / det
             lucas_kanade_optical_flow = np.dot(lucas_kanade_matrix, lucas_kanade_values)
-        '''
-        lucas_kanade_optical_flow[0][0] = lucas_kanade_matrix[0][0] * lucas_kanade_values[0][0] + lucas_kanade_matrix[0][1] * lucas_kanade_values[1][0]
-        lucas_kanade_optical_flow[1][0] = lucas_kanade_matrix[1][0] * lucas_kanade_values[0][0] + \
-                                          lucas_kanade_matrix[1][1] * lucas_kanade_values[1][0]
-                                          '''
+
     except np.linalg.linalg.LinAlgError:
         # I guess just set the flow equal to 0 if the matrix isn't invertible
         lucas_kanade_optical_flow[0][0] = 0
@@ -88,14 +92,7 @@ def calcOpticalFlow(prev_frame, curr_frame):
         for j in range(2, cols - 2):
             # get the 25 points and calculate u and v for them
             curr_flow = calcMatrixValues(i,j,prev_frame, curr_frame)
-            '''
-            grads = curr_flow.astype(np.uint64)
-            mag = np.sqrt(curr_flow[0][0] ** 2 + curr_flow[1][0] ** 2)
-            angle = np.arctan2(grads[1][0], grads[0][0])
-            angle = angle * 180 / np.pi
-            flows[i][j][0] = mag
-            flows[i][j][1] = angle
-            '''
+
             #angle = np.uint8(abs(angle))
             # opencv returns calculated new positions
             flows[i][j][0] = curr_flow[0][0]
@@ -103,6 +100,91 @@ def calcOpticalFlow(prev_frame, curr_frame):
     # now that we're done, return flows
     return flows
 
+
+img_paths = glob.glob(rootdir_training)
+train_labels =[]
+test_labels = []
+training = []
+testing = []
+count = 0
+print "Made it here"
+actions = ["walking", "jogging", "running"]
+for x in range(len(actions)):
+    count = 0
+    print "Count " + str(count)
+    img_paths = glob.glob(rootdir_training + "/" + str(actions[x]) + "/*.avi")
+    for img in img_paths[:]:
+        label = actions[x]
+        descriptor = []
+        cap = cv2.VideoCapture(img)
+        num_frames = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
+        # assume there is at least 1 frame
+        has_more, old_frame = cap.read()
+        curr_frame = 1
+        old_frame = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
+        while True:
+            has_more, new_frame = cap.read()
+            curr_frame += 1
+            # now perform the optical flow calculations
+            # convert to grayscale
+            if has_more:
+                print "still got it"
+            else:
+                print "all out"
+            new_frame = cv2.cvtColor(new_frame, cv2.COLOR_BGR2GRAY)
+            # now need to compute optical flow -> for now just focus on calculating u and v, and don't worry about gradients in x and y direction
+            frame3 = np.zeros((len(old_frame), len(old_frame[0])), dtype=np.float64)
+            frame4 = np.zeros((len(old_frame), len(old_frame[0])), dtype=np.float64)
+
+            for i in range(0, len(old_frame)):
+                for j in range(0, len(old_frame[0])):
+                    frame3[i][j] = np.float64(old_frame[i][j] / 255.)
+                    frame4[i][j] = np.float64(new_frame[i][j] / 255.)
+
+            flow = calcOpticalFlow(frame3, frame4)
+            # now perform the binning and everything else...
+            #get magnitude and angles
+            gradFlow = np.zeros((len(flow), len(flow[0])), dtype=np.uint64)
+            angles = np.zeros((len(flow), len(flow[0])), dtype=np.uint64)
+            # get magnitude and direction
+            for i in range(1, len(flow) - 1):
+                for j in range(1, len(flow[0]) - 1):
+                    mag = flow[i][j][0] ** 2 + flow[i][j][1] ** 2
+                    gradFlow[i][j] = np.sqrt(mag)
+                    angle = np.arctan2(flow[i][j][0], flow[i][j][1])
+                    # angle = angle * 180 / np.pi
+                    # angle = np.uint8(abs(angle))
+                    angles[i][j] = angle
+
+
+            hoof = HoG.bin_gradients(gradFlow, angles)
+
+            hoof = HoG.normalize_hog(hoof)
+
+            hoof = HoG.concatenate(hoof)
+
+            #now append it
+            descriptor.append(hoof)
+            #each one has 100 videos, so use 70 for training and rest for testing
+            if not has_more or curr_frame >= num_frames / 5:
+                break
+            else:
+                old_frame = new_frame
+        if count > 70:
+            test_labels.append(label)
+            testing.append(descriptor)
+        else:
+            train_labels.append(label)
+            training.append(descriptor)
+        count += 1
+        cap.release()
+
+print "Finished"
+clf = svm.SVC()
+clf.fit(training, train_labels)
+predict = clf.predict(testing)
+print metrics.accuracy_score(predict, test_labels)
+exit(0)
 
 # convert to gray-scale
 frame1 = cv2.cvtColor(original_frame1,cv2.COLOR_BGR2GRAY)
@@ -140,15 +222,7 @@ for i in range(1, len(flow) - 1):
         #gradFlow[i][j][1] = angle
 '''
 
-# params for ShiTomasi corner detection
-'''
-feature_params = dict( maxCorners = 100,
-                       qualityLevel = 0.3,
-                       minDistance = 7,
-                       blockSize = 7 )
 
-p0 = cv2.goodFeaturesToTrack(frame1, mask = None, **feature_params)
-'''
 #flow = cv2.calcOpticalFlowPyrLK(frame1, frame2, p0)
 
 prvs = frame1

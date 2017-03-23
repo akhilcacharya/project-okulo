@@ -17,8 +17,8 @@ gradMag = np.uint8(min(gradMag, 255))
 print gradMag
 exit(0)
 '''
-CELL_WIDTH = 7
-CELL_HEIGHT = 7
+CELL_WIDTH = 8
+CELL_HEIGHT = 8
 
 rootdir_training = 'mnist_png/training'
 rootdir_testing = 'mnist_png/testing'
@@ -185,112 +185,72 @@ def concatenate(array):
                 concatenated_array = np.concatenate([concatenated_array, array[i][j]])
     return concatenated_array
 
+def main():
 
-test_image_path = os.path.abspath("mnist_png/testing/0/3.png")
+    test_image_path = os.path.abspath("mnist_png/testing/0/3.png")
 
-rgb = cv2.imread(test_image_path)
-'''
-rgb = cv2.resize(rgb, (0,0), fx=1, fy=2)
-plt.imshow(rgb)
-plt.show()
-exit(0)
-'''
-r = rgb[:,:,0]
-g = rgb[:,:,1]
-b = rgb[:,:,2]
+    rgb = cv2.imread(test_image_path)
+    '''
+    rgb = cv2.resize(rgb, (0,0), fx=1, fy=2)
+    plt.imshow(rgb)
+    plt.show()
+    exit(0)
+    '''
+    r = rgb[:,:,0]
+    g = rgb[:,:,1]
+    b = rgb[:,:,2]
 
-# calculate gradients for each of r, g, b
-gradient, angles = apply_kernel(rgb)
-
-
-
-hog = bin_gradients(gradient, angles)
-
-hog = normalize_hog(hog)
-
-
-hog = concatenate(hog)
-
-
-winSize = (28, 28)
-blockSize = (14,14)
-blockStride = (7,7)
-cellSize = (7,7)
-nbins = 9
-derivAperture = 1
-winSigma = 4.
-histogramNormType = 0
-L2HysThreshold = 2.0000000000000001e-01
-gammaCorrection = True
+    # calculate gradients for each of r, g, b
+    gradient, angles = apply_kernel(rgb)
 
 
 
-hog2 = cv2.HOGDescriptor(winSize,blockSize,blockStride,cellSize,nbins)#,derivAperture,winSigma,
-                        #histogramNormType,L2HysThreshold,gammaCorrection)
+    hog = bin_gradients(gradient, angles)
+
+    hog = normalize_hog(hog)
 
 
-'''
+    hog = concatenate(hog)
 
-plt.imshow(rgb)
-plt.show()
 
-plt.imshow(gradient)
-plt.show()
-'''
+    winSize = (28, 28)
+    blockSize = (14,14)
+    blockStride = (7,7)
+    cellSize = (7,7)
+    nbins = 9
+    derivAperture = 1
+    winSigma = 4.
+    histogramNormType = 0
+    L2HysThreshold = 2.0000000000000001e-01
+    gammaCorrection = True
 
-'''
-img_paths = glob.glob(rootdir_training + "/0/*.png")
-train_labels =[]
-training = []
-count = 0
-for img in img_paths[:]:
-    if count > 100:
-        break
-    label = img.split("/")[-2]
-    print label
-    data = cv2.imread(img)
-    #vec = hog2.compute(data)
-    gradients, angles = apply_kernel(data)
-    vec = bin_gradients(gradients, angles)
-    vec = normalize_hog(vec)
-    vec = concatenate(vec)
-    train_labels.append(label)
-    training.append(vec)
-    count += 1
-img_paths = glob.glob(rootdir_testing + "/0/*.png")
-test_labels =[]
-testing = []
-count = 0
-for img in img_paths[:]:
-    if count > 100:
-        break
-    count += 1
-    label = img.split("/")[-2]
-    print label
-    data = cv2.imread(img)
-    #vec = hog2.compute(data)
-    gradients, angles = apply_kernel(data)
-    vec = bin_gradients(gradients, angles)
-    vec = normalize_hog(vec)
-    vec = concatenate(vec)
-    test_labels.append(label)
-    testing.append(vec)
-'''
-train_labels =[]
-training = []
-test_labels =[]
-testing = []
-for x in range(0, 10):
+
+
+    hog2 = cv2.HOGDescriptor(winSize,blockSize,blockStride,cellSize,nbins)#,derivAperture,winSigma,
+                            #histogramNormType,L2HysThreshold,gammaCorrection)
+
+
+    '''
+
+    plt.imshow(rgb)
+    plt.show()
+
+    plt.imshow(gradient)
+    plt.show()
+    '''
+
+    '''
+    img_paths = glob.glob(rootdir_training + "/0/*.png")
+    train_labels =[]
+    training = []
     count = 0
-    img_paths = glob.glob(rootdir_training + "/" + str(x) + "/*.png")
     for img in img_paths[:]:
-        if count > 200:
+        if count > 100:
             break
         label = img.split("/")[-2]
         print label
         data = cv2.imread(img)
         #vec = hog2.compute(data)
-        data = cv2.resize(data, (0, 0), fx=2, fy=4)
         gradients, angles = apply_kernel(data)
         vec = bin_gradients(gradients, angles)
         vec = normalize_hog(vec)
@@ -298,16 +258,17 @@ for x in range(0, 10):
         train_labels.append(label)
         training.append(vec)
         count += 1
-    img_paths = glob.glob(rootdir_testing + "/" + str(x) + "/*.png")
+    img_paths = glob.glob(rootdir_testing + "/0/*.png")
+    test_labels =[]
+    testing = []
     count = 0
     for img in img_paths[:]:
-        if count > 200:
+        if count > 100:
             break
         count += 1
         label = img.split("/")[-2]
         print label
         data = cv2.imread(img)
-        data = cv2.resize(data, (0, 0), fx=2, fy=4)
         #vec = hog2.compute(data)
         gradients, angles = apply_kernel(data)
         vec = bin_gradients(gradients, angles)
@@ -315,12 +276,56 @@ for x in range(0, 10):
         vec = concatenate(vec)
         test_labels.append(label)
         testing.append(vec)
-#nsamples, nx, ny = np.asarray(training).shape
-#training = np.asarray(training).reshape((nsamples,nx*ny))
-#nsamples, nx, ny = np.asarray(testing).shape
-#testing = np.asarray(testing).reshape((nsamples,nx*ny))
+    '''
+    train_labels =[]
+    training = []
+    test_labels =[]
+    testing = []
+    for x in range(0, 10):
+        count = 0
+        img_paths = glob.glob(rootdir_training + "/" + str(x) + "/*.png")
+        for img in img_paths[:]:
+            if count > 200:
+                break
+            label = img.split("/")[-2]
+            print label
+            data = cv2.imread(img)
+            #vec = hog2.compute(data)
+            data = cv2.resize(data, (0, 0), fx=2, fy=4)
+            gradients, angles = apply_kernel(data)
+            vec = bin_gradients(gradients, angles)
+            vec = normalize_hog(vec)
+            vec = concatenate(vec)
+            train_labels.append(label)
+            training.append(vec)
+            count += 1
+        img_paths = glob.glob(rootdir_testing + "/" + str(x) + "/*.png")
+        count = 0
+        for img in img_paths[:]:
+            if count > 200:
+                break
+            count += 1
+            label = img.split("/")[-2]
+            print label
+            data = cv2.imread(img)
+            data = cv2.resize(data, (0, 0), fx=2, fy=4)
+            #vec = hog2.compute(data)
+            gradients, angles = apply_kernel(data)
+            vec = bin_gradients(gradients, angles)
+            vec = normalize_hog(vec)
+            vec = concatenate(vec)
+            test_labels.append(label)
+            testing.append(vec)
+    #nsamples, nx, ny = np.asarray(training).shape
+    #training = np.asarray(training).reshape((nsamples,nx*ny))
+    #nsamples, nx, ny = np.asarray(testing).shape
+    #testing = np.asarray(testing).reshape((nsamples,nx*ny))
 
-clf = svm.SVC()
-clf.fit(training, train_labels)
-predict = clf.predict(testing)
-print metrics.accuracy_score(predict, test_labels)
+    clf = svm.SVC()
+    clf.fit(training, train_labels)
+    predict = clf.predict(testing)
+    print metrics.accuracy_score(predict, test_labels)
+
+
+if __name__ == "main":
+    main()
