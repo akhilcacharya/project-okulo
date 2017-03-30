@@ -101,90 +101,7 @@ def calcOpticalFlow(prev_frame, curr_frame):
     return flows
 
 
-img_paths = glob.glob(rootdir_training)
-train_labels =[]
-test_labels = []
-training = []
-testing = []
-count = 0
-print "Made it here"
-actions = ["walking", "jogging", "running"]
-for x in range(len(actions)):
-    count = 0
-    print "Count " + str(count)
-    img_paths = glob.glob(rootdir_training + "/" + str(actions[x]) + "/*.avi")
-    for img in img_paths[:]:
-        label = actions[x]
-        descriptor = []
-        cap = cv2.VideoCapture(img)
-        num_frames = int(cap.get(cv2.cv.CV_CAP_PROP_FRAME_COUNT))
-        # assume there is at least 1 frame
-        has_more, old_frame = cap.read()
-        curr_frame = 1
-        old_frame = cv2.cvtColor(old_frame, cv2.COLOR_BGR2GRAY)
-        while True:
-            has_more, new_frame = cap.read()
-            curr_frame += 1
-            # now perform the optical flow calculations
-            # convert to grayscale
-            if has_more:
-                print "still got it"
-            else:
-                print "all out"
-            new_frame = cv2.cvtColor(new_frame, cv2.COLOR_BGR2GRAY)
-            # now need to compute optical flow -> for now just focus on calculating u and v, and don't worry about gradients in x and y direction
-            frame3 = np.zeros((len(old_frame), len(old_frame[0])), dtype=np.float64)
-            frame4 = np.zeros((len(old_frame), len(old_frame[0])), dtype=np.float64)
 
-            for i in range(0, len(old_frame)):
-                for j in range(0, len(old_frame[0])):
-                    frame3[i][j] = np.float64(old_frame[i][j] / 255.)
-                    frame4[i][j] = np.float64(new_frame[i][j] / 255.)
-
-            flow = calcOpticalFlow(frame3, frame4)
-            # now perform the binning and everything else...
-            #get magnitude and angles
-            gradFlow = np.zeros((len(flow), len(flow[0])), dtype=np.uint64)
-            angles = np.zeros((len(flow), len(flow[0])), dtype=np.uint64)
-            # get magnitude and direction
-            for i in range(1, len(flow) - 1):
-                for j in range(1, len(flow[0]) - 1):
-                    mag = flow[i][j][0] ** 2 + flow[i][j][1] ** 2
-                    gradFlow[i][j] = np.sqrt(mag)
-                    angle = np.arctan2(flow[i][j][0], flow[i][j][1])
-                    # angle = angle * 180 / np.pi
-                    # angle = np.uint8(abs(angle))
-                    angles[i][j] = angle
-
-
-            hoof = HoG.bin_gradients(gradFlow, angles)
-
-            hoof = HoG.normalize_hog(hoof)
-
-            hoof = HoG.concatenate(hoof)
-
-            #now append it
-            descriptor.append(hoof)
-            #each one has 100 videos, so use 70 for training and rest for testing
-            if not has_more or curr_frame >= num_frames / 5:
-                break
-            else:
-                old_frame = new_frame
-        if count > 70:
-            test_labels.append(label)
-            testing.append(descriptor)
-        else:
-            train_labels.append(label)
-            training.append(descriptor)
-        count += 1
-        cap.release()
-
-print "Finished"
-clf = svm.SVC()
-clf.fit(training, train_labels)
-predict = clf.predict(testing)
-print metrics.accuracy_score(predict, test_labels)
-exit(0)
 
 # convert to gray-scale
 frame1 = cv2.cvtColor(original_frame1,cv2.COLOR_BGR2GRAY)
@@ -192,11 +109,11 @@ frame2 = cv2.cvtColor(original_frame2,cv2.COLOR_BGR2GRAY)
 
 
 
-'''
+
 plt.subplot(1,2,1),plt.imshow(frame1, cmap="gray"),plt.title("Frame 1"),plt.xticks([]), plt.yticks([])
 plt.subplot(1,2,2),plt.imshow(frame2, cmap="gray"),plt.title("Frame 2"),plt.xticks([]), plt.yticks([])
 plt.show()
-'''
+
 
 # now need to compute optical flow -> for now just focus on calculating u and v, and don't worry about gradients in x and y direction
 frame3 = np.zeros((len(frame1), len(frame1[0])), dtype=np.float64)
@@ -239,7 +156,7 @@ flags = 0
 their_flow = cv2.calcOpticalFlowFarneback(prvs, next, 0, 0, 3, 15, 3, 5, 1, 0)
 
 
-'''
+
 mag, ang = cv2.cartToPolar(flow[...,0], flow[...,1])
 
 hsv = np.zeros_like(original_frame1)
@@ -250,7 +167,7 @@ rgb = cv2.cvtColor(hsv,cv2.COLOR_HSV2BGR)
 
 plt.subplot(1,1,1),plt.imshow(rgb),plt.title("RGB")
 plt.show()
-'''
+
 st2 = 1 # variable to reduce density of the vector field
 
 Uf = np.flipud(flow[...,0]) # horizontal optical flow
