@@ -182,9 +182,9 @@ def getSequentialHoF(video_path):
     return hofs
 
 # Find the length of the largest row in training set and testing set
-def maxRow(test, train):
-    return max(np.array([len(i) for i in train]).max(),
-               np.array([len(i) for i in test]).max())
+def maxRow(test)#, train):
+    return max(np.array([len(i) for i in train]).max())#,
+#               np.array([len(i) for i in test]).max())
 
 # Pad each row of the 2D array, with 0, to a specified width
 def numpy_fillna(data, width):
@@ -204,7 +204,7 @@ def getFeatures_Baseline(train_files, train_labels):#, test_files, test_labels):
     #test = [getSequentialHoF(p) for p in test_files]
 
     # Pad them to the max video width
-    max_width = maxRow(test, train);
+    max_width = maxRow(test)#, train);
     train_pad = numpy_fillna(np.array(train), max_width)
     #test_pad = numpy_fillna(np.array(test), max_width)
 
@@ -308,7 +308,7 @@ def getFeatures_Segmented(train_files, train_labels):#, test_files, test_labels)
     train_labels_trimmed = [y for x,y in zip(train,new_train_labels) if len(x) > train_threshold]
     #test_trimmed = [x for x,y in zip(test,new_test_labels) if len(x) > test_threshold]
     #test_labels_trimmed = [y for x,y in zip(test,new_test_labels) if len(x) > test_threshold]
-    max_width = max(np.array([len(i) for i in test_trimmed]).max(),np.array([len(i) for i in test_trimmed]).max())
+    max_width = np.array([len(i) for i in train_trimmed]).max()#max(np.array([len(i) for i in train_trimmed]).max(),np.array([len(i) for i in test_trimmed]).max())
     train_pad = numpy_fillna(np.array(train_trimmed), max_width)
     #test_pad = numpy_fillna(np.array(test_trimmed), max_width)
 
@@ -358,7 +358,7 @@ def getFeatures_Pyramid_Baseline(train_files, train_labels):#, test_files, test_
     #test = [getPyramidHof(p, LEVEL) for p in test_files]
 
     # Pad them to the max video width
-    max_width = maxRow(test, train);
+    max_width = maxRow(test)#, train);
     train_pad = numpy_fillna(np.array(train), max_width)
     #test_pad = numpy_fillna(np.array(test), max_width)
 
@@ -441,7 +441,7 @@ def getFeatures_Pyramid_Segmented(train_files, train_labels):#, test_files, test
     train_labels_trimmed = [y for x,y in zip(train,new_train_labels) if len(x) > train_threshold]
     #test_trimmed = [x for x,y in zip(test,new_test_labels) if len(x) > test_threshold]
     #test_labels_trimmed = [y for x,y in zip(test,new_test_labels) if len(x) > test_threshold]
-    max_width = max(np.array([len(i) for i in test_trimmed]).max(),np.array([len(i) for i in test_trimmed]).max())
+    max_width = np.array([len(i) for i in train_trimmed]).max()#max(np.array([len(i) for i in train_trimmed]).max(),np.array([len(i) for i in test_trimmed]).max())
     train_pad = numpy_fillna(np.array(train_trimmed), max_width)
     #test_pad = numpy_fillna(np.array(test_trimmed), max_width)
 
