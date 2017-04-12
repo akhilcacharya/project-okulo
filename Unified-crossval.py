@@ -28,22 +28,22 @@ ACT1_FILES = os.listdir(ACT1_DIR)
 ACT1_FILES = [ACT1_DIR + f for f in ACT1_FILES]
 
 # Directory and files of the second action
-ACT2_DIR = "./hof/walk/"
+ACT2_DIR = "./hof/jump/"
 ACT2_FILES = os.listdir(ACT2_DIR)
 ACT2_FILES = [ACT2_DIR + f for f in ACT2_FILES]
 
 # Directory and files of the third action
-ACT3_DIR = "./hof/walk/"
+ACT3_DIR = "./hof/stand/"
 ACT3_FILES = os.listdir(ACT3_DIR)
 ACT3_FILES = [ACT3_DIR + f for f in ACT3_FILES]
 
 # Directory and files of the fourth action
-ACT4_DIR = "./hof/walk/"
+ACT4_DIR = "./hof/throw/"
 ACT4_FILES = os.listdir(ACT4_DIR)
 ACT4_FILES = [ACT4_DIR + f for f in ACT4_FILES]
 
 # Directory and files of the fifth action
-ACT5_DIR = "./hof/walk/"
+ACT5_DIR = "./hof/kick/"
 ACT5_FILES = os.listdir(ACT5_DIR)
 ACT5_FILES = [ACT5_DIR + f for f in ACT5_FILES]
 
