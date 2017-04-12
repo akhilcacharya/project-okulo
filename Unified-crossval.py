@@ -182,7 +182,7 @@ def getSequentialHoF(video_path):
     return hofs
 
 # Find the length of the largest row in training set and testing set
-def maxRow(test)#, train):
+def maxRow(test):#, train):
     return max(np.array([len(i) for i in train]).max())#,
 #               np.array([len(i) for i in test]).max())
 
