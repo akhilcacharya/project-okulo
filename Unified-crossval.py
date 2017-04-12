@@ -204,7 +204,7 @@ def getFeatures_Baseline(train_files, train_labels):#, test_files, test_labels):
     #test = [getSequentialHoF(p) for p in test_files]
 
     # Pad them to the max video width
-    max_width = maxRow(test)#, train);
+    max_width = maxRow(train)#, train);
     train_pad = numpy_fillna(np.array(train), max_width)
     #test_pad = numpy_fillna(np.array(test), max_width)
 
@@ -358,7 +358,7 @@ def getFeatures_Pyramid_Baseline(train_files, train_labels):#, test_files, test_
     #test = [getPyramidHof(p, LEVEL) for p in test_files]
 
     # Pad them to the max video width
-    max_width = maxRow(test)#, train);
+    max_width = maxRow(train)#, train);
     train_pad = numpy_fillna(np.array(train), max_width)
     #test_pad = numpy_fillna(np.array(test), max_width)
 
