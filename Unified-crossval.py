@@ -475,25 +475,25 @@ def run(data):
         print(name + ": %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
 
 print "baseline"
-data = getFeatures_Baseline(train_files, train_labels, test_files, test_labels)
+data = getFeatures_Baseline(train_files, train_labels)#, test_files, test_labels)
 run(data)
 
 print "\n\ntrimmed"
-data = getFeatures_Trimmed(train_files, train_labels, test_files, test_labels)
+data = getFeatures_Trimmed(train_files, train_labels)#, test_files, test_labels)
 run(data)
 
 print "\n\nsegmented"
-data = getFeatures_Segmented(train_files, train_labels, test_files, test_labels)
+data = getFeatures_Segmented(train_files, train_labels)#, test_files, test_labels)
 run(data)
 
 print "\n\npyramid"
-data = getFeatures_Pyramid_Baseline(train_files, train_labels, test_files, test_labels)
+data = getFeatures_Pyramid_Baseline(train_files, train_labels)#, test_files, test_labels)
 run(data)
 
 print "\n\np + t"
-data = getFeatures_Pyramid_Trimmed(train_files, train_labels, test_files, test_labels)
+data = getFeatures_Pyramid_Trimmed(train_files, train_labels)#, test_files, test_labels)
 run(data)
 
 print "\n\np + s"
-data = getFeatures_Pyramid_Segmented(train_files, train_labels, test_files, test_labels)
+data = getFeatures_Pyramid_Segmented(train_files, train_labels)#, test_files, test_labels)
 run(data)
