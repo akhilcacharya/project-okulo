@@ -48,7 +48,7 @@ ACT5_FILES = os.listdir(ACT5_DIR)
 ACT5_FILES = [ACT5_DIR + f for f in ACT5_FILES]
 
 # Use equal number of data from each class, setting a cap at a total of 464 files
-nc = $min(len(ACT1_FILES), len(ACT2_FILES), len(ACT3_FILES), len(ACT4_FILES), len(ACT5_FILES))
+nc = min(len(ACT1_FILES), len(ACT2_FILES), len(ACT3_FILES), len(ACT4_FILES), len(ACT5_FILES))
 nc = nc if (nc < 92) else 92
 print "nc:", nc
 ACT1_FILES = ACT1_FILES[0:nc]
