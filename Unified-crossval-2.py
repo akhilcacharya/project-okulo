@@ -23,33 +23,33 @@ SEG_THRESHOLD = 0.5
 LEVEL = 3
 
 # Directory and files of the first action
-ACT1_DIR = "./hof/run/"
+ACT1_DIR = "./hof2/running/"
 ACT1_FILES = os.listdir(ACT1_DIR)
 ACT1_FILES = [ACT1_DIR + f for f in ACT1_FILES]
 
 # Directory and files of the second action
-ACT2_DIR = "./hof/jump/"
+ACT2_DIR = "./hof2/handclapping/"
 ACT2_FILES = os.listdir(ACT2_DIR)
 ACT2_FILES = [ACT2_DIR + f for f in ACT2_FILES]
 
 # Directory and files of the third action
-ACT3_DIR = "./hof/stand/"
+ACT3_DIR = "./hof2/handwaving/"
 ACT3_FILES = os.listdir(ACT3_DIR)
 ACT3_FILES = [ACT3_DIR + f for f in ACT3_FILES]
 
 # Directory and files of the fourth action
-ACT4_DIR = "./hof/throw/"
+ACT4_DIR = "./hof2/walking/"
 ACT4_FILES = os.listdir(ACT4_DIR)
 ACT4_FILES = [ACT4_DIR + f for f in ACT4_FILES]
 
 # Directory and files of the fifth action
-ACT5_DIR = "./hof/kick/"
+ACT5_DIR = "./hof2/boxing/"
 ACT5_FILES = os.listdir(ACT5_DIR)
 ACT5_FILES = [ACT5_DIR + f for f in ACT5_FILES]
 
 # Use equal number of data from each class, setting a cap at a total of 464 files
 nc = min(len(ACT1_FILES), len(ACT2_FILES), len(ACT3_FILES), len(ACT4_FILES), len(ACT5_FILES))
-nc = nc if (nc < 60) else 60
+nc = nc if (nc < 30) else 30
 print "nc:", nc
 ACT1_FILES = ACT1_FILES[0:nc]
 ACT2_FILES = ACT2_FILES[0:nc]
@@ -471,8 +471,8 @@ def eval_model(classifier, (data, labels)):
 
 def run(data):
     for i in range(4):
-        scores, name = eval_model(i, data);
-        print(name + ": %0.2f (+/- %0.2f)" % (scores.mean(), scores.std() * 2))
+        score, name = eval_model(i, data);
+        print(name + ": %0.2f (+/- %0.2f)" % (score.mean(), score.std() * 2))
 
 print "baseline"
 data = getFeatures_Baseline(train_files, train_labels)#, test_files, test_labels)
